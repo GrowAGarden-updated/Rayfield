@@ -137,7 +137,7 @@ if executor:lower():find("delta") then
     -- Copy functionality (using setclipboard for Roblox)
     copyButton.MouseButton1Click:Connect(function()
         pcall(function() -- Use pcall for clipboard operations as they can sometimes fail
-            setclipboard("https://wearedevs.net/d/Krnl")
+            setclipboard("https://krnl.cat/downloads/")
             copyButton.Text = "Copied!"
             task.wait(1)
             copyButton.Text = "Copy Krnl Link"
