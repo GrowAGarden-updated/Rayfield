@@ -84,7 +84,7 @@ if executor:lower():find("delta") then
     mainFrame.Size = UDim2.new(0, 400, 0, 200) -- Fixed size like in HTML
     mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Changed to dark gray/black to match image
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Changed to dark green/white to match image
     mainFrame.BorderSizePixel = 0
     mainFrame.Parent = screenGui
 
