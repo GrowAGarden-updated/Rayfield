@@ -1,15 +1,3 @@
---[[
-    Delta Executor Detection + Freeze Lock by Nelli (Recreated in Lua for Roblox)
-
-    This script aims to replicate the functionality and visual style of the
-    HTML UI for a Roblox environment. It detects if the script is running
-    on a "Delta" executor, and if so, applies a freeze effect and displays
-    a custom UI with a message and a copy button.
-
-    Note: This is a client-side script (LocalScript) and should be placed
-    in StarterPlayerScripts or PlayerGui.
-]]
-
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
