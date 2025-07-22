@@ -1,2 +1,2 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/Rayfield/refs/heads/main/Mainv2.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/Rayfield/refs/heads/main/MainV3.lua"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
