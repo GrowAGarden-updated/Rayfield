@@ -13,7 +13,8 @@
             overflow: hidden; /* Prevent scrolling */
         }
         .background-image {
-            background-image: url('https://placehold.co/1920x1080/000000/FFFFFF?text=Blurred+Background'); /* Placeholder image */
+            /* Using a slightly more visually interesting placeholder that still fits the "game" theme */
+            background-image: url('https://placehold.co/1920x1080/2c3e50/ecf0f1?text=Game+Background');
             background-size: cover;
             background-position: center;
             filter: blur(8px); /* Apply blur effect */
@@ -73,20 +74,40 @@
         document.getElementById('copyButton').addEventListener('click', function() {
             const linkToCopy = "https://wearedevs.net/d/Krnl";
             const button = this;
+            const originalText = "Copy KRNL Link";
+            const copiedText = "Copied!";
+            const failedText = "Failed to copy!";
 
-            // Use a temporary textarea to copy text to clipboard
+            // Create a temporary textarea element
             const tempInput = document.createElement('textarea');
             tempInput.value = linkToCopy;
+            // Make it invisible and off-screen
+            tempInput.style.position = 'absolute';
+            tempInput.style.left = '-9999px';
+            tempInput.style.top = '-9999px';
             document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
 
-            // Change button text to "Copied!" and revert after a delay
-            button.textContent = "Copied!";
-            setTimeout(() => {
-                button.textContent = "Copy KRNL Link";
-            }, 1000);
+            try {
+                tempInput.select(); // Select the text
+                const success = document.execCommand('copy'); // Execute copy command
+
+                if (success) {
+                    button.textContent = copiedText;
+                } else {
+                    button.textContent = failedText;
+                    console.error('Failed to copy text using execCommand.');
+                }
+            } catch (err) {
+                button.textContent = failedText;
+                console.error('Error copying text:', err);
+            } finally {
+                document.body.removeChild(tempInput); // Clean up the temporary element
+
+                // Revert button text after a delay
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 1500); // Increased delay slightly for better visibility
+            }
         });
     </script>
 </body>
