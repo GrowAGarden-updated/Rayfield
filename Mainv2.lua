@@ -84,7 +84,7 @@ if executor:lower():find("delta") then
     mainFrame.Size = UDim2.new(0, 400, 0, 200) -- Fixed size like in HTML
     mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White background
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Changed to dark gray/black to match image
     mainFrame.BorderSizePixel = 0
     mainFrame.Parent = screenGui
 
@@ -96,7 +96,7 @@ if executor:lower():find("delta") then
     title.Text = "Error Message" -- From HTML
     title.Font = Enum.Font.Gotham -- Common Roblox font
     title.TextSize = 18
-    title.TextColor3 = Color3.fromRGB(30, 30, 30)
+    title.TextColor3 = Color3.fromRGB(255, 255, 255) -- Changed to white
     title.BackgroundTransparency = 1
     title.Size = UDim2.new(1, -40, 0, 30) -- Adjusted for single line
     title.Position = UDim2.new(0, 20, 0, 10)
@@ -109,7 +109,7 @@ if executor:lower():find("delta") then
     messageText.Text = "Delta Executor detected.\n\nIf you're seeing this message, it means your executor blocked this script because the executor doesn't support the script.\n\nTo fix this:\n• Put your Anti-Scam setting off in Delta\n• Or use a compatible executor like KRNL instead!\n\nNatHub recommends KRNL for best results."
     messageText.Font = Enum.Font.Gotham
     messageText.TextSize = 12
-    messageText.TextColor3 = Color3.fromRGB(60, 60, 60)
+    messageText.TextColor3 = Color3.fromRGB(255, 255, 255) -- Changed to white
     messageText.BackgroundTransparency = 1
     messageText.Size = UDim2.new(1, -40, 0, 100) -- Adjusted height for multi-line
     messageText.Position = UDim2.new(0, 20, 0, 40) -- Position below title
@@ -122,11 +122,11 @@ if executor:lower():find("delta") then
     local copyButton = Instance.new("TextButton")
     copyButton.Size = UDim2.new(0, 200, 0, 36)
     copyButton.Position = UDim2.new(0.5, -100, 1, -50) -- Position at the bottom
-    copyButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180) -- Gray background
+    copyButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Changed to dark gray/blue to match image
     copyButton.Text = "Copy Krnl Link"
     copyButton.Font = Enum.Font.Gotham
     copyButton.TextSize = 16
-    copyButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text
+    copyButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Changed to white
     copyButton.AutoButtonColor = true -- Roblox default button hover effect
     copyButton.Parent = mainFrame
 
