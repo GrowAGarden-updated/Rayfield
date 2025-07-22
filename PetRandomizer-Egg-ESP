@@ -1,0 +1,502 @@
+--[[
+    Pet Egg Visual Randomizer Script for Grow a Garden (Client-Side Exploit)
+
+    IMPORTANT:
+    - This script is intended for use with a Roblox exploit/executor.
+    - Using this script violates Roblox's Terms of Service and may lead to a permanent account ban.
+    - This script only provides a VISUAL preview. It does NOT affect actual game mechanics or pet hatching.
+    - You MUST identify the correct 'EGG_MODEL_NAME' and the method to 'determineEggType'
+      by inspecting the game's client-side objects using an exploit's explorer.
+]]
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+
+-- Configuration: You MUST find the actual name of the egg model in the Workspace
+local EGG_MODEL_NAME = "Egg" -- PLACEHOLDER: Example: "CommonEgg", "GoldenEggModel", etc.
+                             -- You might need to change this to a specific name like "Common Egg",
+                             -- or a more general name if all eggs share a base model name.
+                             -- If eggs are named "Common Egg", "Rare Egg", etc., you might need to iterate
+                             -- through possible egg names from the EGG_PETS_DATA keys.
+local PET_SPAWN_LOCATION_OFFSET = Vector3.new(0, 5, 0) -- Offset from the egg where the pet preview appears
+
+-- Data for pets based on Grow a Garden Fandom Wiki (as of July 2025)
+-- Probabilities are included for weighted random selection.
+-- Each sub-table contains {Pet Name, Probability (percentage)}
+local EGG_PETS_DATA = {
+    ["Common Egg"] = {
+        {"Golden Lab", 33.33},
+        {"Dog", 33.33},
+        {"Bunny", 33.33}
+    },
+    ["Uncommon Egg"] = {
+        {"Black Bunny", 25},
+        {"Chicken", 25},
+        {"Cat", 25},
+        {"Deer", 25}
+    },
+    ["Rare Egg"] = {
+        {"Orange Tabby", 33.33},
+        {"Spotted Deer", 25},
+        {"Pig", 16.67},
+        {"Rooster", 16.67},
+        {"Monkey", 8.33}
+    },
+    ["Legendary Egg"] = {
+        {"Cow", 42.55},
+        {"Silver Monkey", 42.55},
+        {"Sea Otter", 10.64},
+        {"Turtle", 2.13},
+        {"Polar Bear", 2.13}
+    },
+    ["Mythical Egg"] = {
+        {"Grey Mouse", 35.71},
+        {"Brown Mouse", 26.79},
+        {"Squirrel", 26.79},
+        {"Red Giant Ant", 8.93},
+        {"Red Fox", 1.79}
+    },
+    ["Bug Egg"] = {
+        {"Snail", 40},
+        {"Giant Ant", 30},
+        {"Caterpillar", 25},
+        {"Praying Mantis", 4},
+        {"Dragonfly", 1}
+    },
+    ["Exotic Bug Egg"] = { -- Pets not listed on wiki, placeholders
+        {"Exotic Bug Pet A", 50},
+        {"Exotic Bug Pet B", 50}
+    },
+    ["Night Egg"] = {
+        {"Hedgehog", 47},
+        {"Mole", 23.5},
+        {"Frog", 17.63},
+        {"Echo Frog", 8.23},
+        {"Night Owl", 3.53},
+        {"Raccoon", 0.12}
+    },
+    ["Premium Night Egg"] = {
+        {"Hedgehog", 49},
+        {"Mole", 22},
+        {"Frog", 14},
+        {"Echo Frog", 10},
+        {"Night Owl", 4},
+        {"Raccoon", 1}
+    },
+    ["Bee Egg"] = {
+        {"Bee", 65},
+        {"Honey Bee", 25},
+        {"Bear Bee", 5},
+        {"Petal Bee", 4},
+        {"Queen Bee (Pet)", 1}
+    },
+    ["Anti Bee Egg"] = {
+        {"Wasp", 55},
+        {"Tarantula Hawk", 30},
+        {"Moth", 13.75},
+        {"Butterfly", 1},
+        {"Disco Bee", 0.25}
+    },
+    ["Premium Anti Bee Egg"] = { -- Pets not listed on wiki, placeholders
+        {"Premium Anti Bee Pet A", 50},
+        {"Premium Anti Bee Pet B", 50}
+    },
+    ["Common Summer Egg"] = {
+        {"Starfish", 50},
+        {"Seagull", 25},
+        {"Crab", 25}
+    },
+    ["Rare Summer Egg"] = {
+        {"Flamingo", 30},
+        {"Toucan", 25},
+        {"Sea Turtle", 20},
+        {"Orangutan", 15},
+        {"Seal", 10}
+    },
+    ["Paradise Egg"] = {
+        {"Ostrich", 40},
+        {"Peacock", 30},
+        {"Capybara", 21},
+        {"Scarlet Macaw", 8},
+        {"Mimic Octopus", 1}
+    },
+    ["Oasis Egg"] = {
+        {"Meerkat", 45},
+        {"Sand Snake", 34.5},
+        {"Axolotl", 15},
+        {"Hyacinth Macaw", 5},
+        {"Fennec Fox", 0.5}
+    },
+    ["Premium Oasis Egg"] = { -- Pets not listed on wiki, placeholders
+        {"Premium Oasis Pet A", 50},
+        {"Premium Oasis Pet B", 50}
+    },
+    ["Dinosaur Egg"] = {
+        {"Raptor", 35},
+        {"Triceratops", 32.5},
+        {"Stegosaurus", 28},
+        {"Pterodactyl", 3},
+        {"Brontosaurus", 1},
+        {"T-Rex", 0.5}
+    },
+    ["Primal Egg"] = {
+        {"Parasaurolophus", 35},
+        {"Iguanodon", 32.5},
+        {"Pachycephalosaurus", 28},
+        {"Dilophosaurus", 3},
+        {"Ankylosaurus", 1},
+        {"Spinosaurus", 0.5}
+    },
+    ["Premium Primal Egg"] = { -- Pets not listed on wiki, placeholders
+        {"Premium Primal Pet A", 50},
+        {"Premium Primal Pet B", 50}
+    },
+    ["Zen Egg"] = {
+        {"Shiba Inu", 40},
+        {"Nihonzaru", 31},
+        {"Tanuki", 20.82},
+        {"Tanchozuru", 4.6},
+        {"Kappa", 3.5},
+        {"Kitsune", 0.08}
+    }
+    -- Add any other eggs from the wiki that become available or relevant as needed
+}
+
+local currentVisualPet = nil
+local eggToObserve = nil
+local isESPActive = false
+local eggTypeFound = nil -- To store the detected egg type
+
+--- Function to select a random pet based on weighted probabilities
+local function selectWeightedRandomPet(petList)
+    if not petList or #petList == 0 then return "No Pets" end
+
+    local totalWeight = 0
+    for _, petData in ipairs(petList) do
+        totalWeight = totalWeight + petData[2] -- petData[2] is the probability
+    end
+
+    local randomNumber = math.random() * totalWeight -- Random float between 0 and totalWeight (0 to 100)
+
+    local cumulativeWeight = 0
+    for _, petData in ipairs(petList) do
+        cumulativeWeight = cumulativeWeight + petData[2]
+        if randomNumber <= cumulativeWeight then
+            return petData[1] -- petData[1] is the pet name
+        end
+    end
+
+    -- Fallback in case of floating point inaccuracies or if no pet is selected (should be rare if weights sum to 100)
+    return petList[1][1]
+end
+
+--- Function to determine the egg type (CRITICAL PLACEHOLDER)
+-- You need to inspect the game to figure out how to identify the egg type from its model.
+-- This might involve:
+-- 1. Checking the eggModel's Name (e.g., if it's named "Common Egg", "Golden Egg")
+-- 2. Checking for StringValue or other properties within the eggModel that indicate type.
+-- 3. Analyzing the egg's visual appearance (more complex, likely involves texture/mesh IDs).
+-- This function is crucial for linking the in-game egg to its data in EGG_PETS_DATA.
+local function determineEggType(eggModel)
+    local lowerName = eggModel.Name:lower()
+
+    -- Attempt to match by exact name or parts of the name
+    for eggNameInTable, _ in pairs(EGG_PETS_DATA) do
+        -- Check if the model's name exactly matches an egg name in our table
+        if lowerName == eggNameInTable:lower() then
+            return eggNameInTable
+        end
+        -- Check if the model's name contains a significant part of the egg name (e.g., "common" for "Common Egg")
+        -- We'll try to be flexible with the stripping for better matching.
+        local strippedEggName = eggNameInTable:lower()
+        strippedEggName = strippedEggName:gsub(" egg", "")
+        strippedEggName = strippedEggName:gsub(" premium ", "")
+        strippedEggName = strippedEggName:gsub(" anti ", "")
+        strippedEggName = strippedEggName:gsub(" common ", "")
+        strippedEggName = strippedEggName:gsub(" rare ", "")
+        strippedEggName = strippedEggName:gsub(" legendary ", "")
+        strippedEggName = strippedEggName:gsub(" mythical ", "")
+        strippedEggName = strippedEggName:gsub(" bug ", "")
+        strippedEggName = strippedEggName:gsub(" exotic ", "")
+        strippedEggName = strippedEggName:gsub(" night ", "")
+        strippedEggName = strippedEggName:gsub(" summer ", "")
+        strippedEggName = strippedEggName:gsub(" paradise ", "")
+        strippedEggName = strippedEggName:gsub(" oasis ", "")
+        strippedEggName = strippedEggName:gsub(" dinosaur ", "")
+        strippedEggName = strippedEggName:gsub(" primal ", "")
+        strippedEggName = strippedEggName:gsub(" zen ", "")
+        strippedEggName = strippedEggName:gsub(" bee ", "")
+
+        if strippedEggName ~= "" and lowerName:find(strippedEggName) then
+            return eggNameInTable
+        end
+    end
+
+    -- More advanced detection (if relevant, uncomment and adapt after inspection)
+    -- This section assumes there might be a StringValue or Attribute inside the egg model
+    -- that explicitly states its type.
+    -- Example 1: If there's a StringValue child named "EggType"
+    local eggTypeValue = eggModel:FindFirstChild("EggType", true)
+    if eggTypeValue and eggTypeValue:IsA("StringValue") then
+        local foundType = eggTypeValue.Value
+        if EGG_PETS_DATA[foundType] then
+            return foundType
+        end
+    end
+
+    -- Example 2: If there's an Attribute named "EggCategory" or similar
+    -- if eggModel:GetAttribute("EggCategory") then
+    --     local foundType = eggModel:GetAttribute("EggCategory")
+    --     if EGG_PETS_DATA[foundType .. " Egg"] then -- e.g., "Common" attribute points to "Common Egg"
+    --         return foundType .. " Egg"
+    --     end
+    -- end
+
+
+    -- Fallback: If no specific type is determined, use "Common Egg" data or a generic "Unknown Egg"
+    print("Warning: Could not precisely determine egg type for model:", eggModel.Name, ". Defaulting to 'Common Egg' data.")
+    return "Common Egg" -- This is a safe fallback, but ideally you'd identify the egg correctly.
+end
+
+
+--- Function to set a random visual pet above the egg
+local function showRandomPetVisual(eggModel)
+    if not eggModel or not eggModel:IsDescendantOf(Workspace) then
+        -- Clean up if the egg is gone
+        if currentVisualPet and currentVisualPet:IsDescendantOf(Workspace) then
+            currentVisualPet:Destroy()
+            currentVisualPet = nil
+        end
+        eggToObserve = nil
+        eggTypeFound = nil
+        return
+    end
+
+    eggTypeFound = determineEggType(eggModel)
+    local possiblePets = EGG_PETS_DATA[eggTypeFound]
+
+    if not possiblePets or #possiblePets == 0 then
+        print("Could not find pet data for egg type:", eggTypeFound, ". Falling back to Common Egg pets.")
+        possiblePets = EGG_PETS_DATA["Common Egg"] or {{"Unknown Pet", 100}} -- Ensure a fallback
+    end
+
+    -- Clear previous visual if any
+    if currentVisualPet and currentVisualPet:IsDescendantOf(Workspace) then
+        currentVisualPet:Destroy()
+    end
+
+    local randomPetName = selectWeightedRandomPet(possiblePets)
+
+    -- Create a simple part with a BillboardGui to display the pet name
+    local petPreviewPart = Instance.new("Part")
+    petPreviewPart.Size = Vector3.new(0.5, 0.5, 0.5) -- Make it smaller
+    petPreviewPart.Transparency = 1 -- Make it invisible
+    petPreviewPart.CanCollide = false
+    petPreviewPart.Anchored = true
+    petPreviewPart.CFrame = eggModel.CFrame * CFrame.new(PET_SPAWN_LOCATION_OFFSET)
+    petPreviewPart.Parent = Workspace
+
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Size = UDim2.new(0, 150, 0, 75) -- Adjusted size
+    billboardGui.Adornee = petPreviewPart
+    billboardGui.AlwaysOnTop = true
+    billboardGui.ExtentsOffset = Vector3.new(0, 0, 0) -- Adjust if needed
+    billboardGui.StudsOffset = Vector3.new(0, 1.5, 0) -- Position above the part
+    billboardGui.Parent = petPreviewPart
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Text = randomPetName
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 0) -- Bright Yellow
+    textLabel.TextScaled = true
+    textLabel.BackgroundTransparency = 1
+    textLabel.Font = Enum.Font.SourceSansBold -- A bolder font
+    textLabel.TextStrokeTransparency = 0 -- Add a stroke for better visibility
+    textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Black stroke
+    textLabel.Parent = billboardGui
+
+    currentVisualPet = petPreviewPart
+end
+
+--- Function to find and observe an egg
+-- This function needs to be adapted to how "Grow a Garden" spawns/stores eggs.
+-- It's common for eggs to be direct children of Workspace, or in a specific folder.
+local function findAndObserveEgg()
+    -- Clear current observation
+    if currentVisualPet and currentVisualPet:IsDescendantOf(Workspace) then
+        currentVisualPet:Destroy()
+        currentVisualPet = nil
+    end
+    eggToObserve = nil
+    eggTypeFound = nil
+
+    local foundEgg = nil
+    -- Iterate through descendants to find the egg model
+    -- You might need to refine this search if eggs are in specific containers
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") or obj:IsA("Part") then
+            local lowerName = obj.Name:lower()
+            -- Check if the object's name contains "egg" or matches a known egg type from our data keys
+            local isEggBasedOnName = false
+            for eggTypeName, _ in pairs(EGG_PETS_DATA) do
+                -- Check for direct match or partial match (e.g., "common egg" or just "common")
+                if lowerName == eggTypeName:lower() or lowerName:find(eggTypeName:lower():gsub(" egg", "")) then
+                    isEggBasedOnName = true
+                    break
+                end
+            end
+
+            -- You can also use a general EGG_MODEL_NAME if there's a consistent base name for all eggs.
+            if isEggBasedOnName or lowerName:find(EGG_MODEL_NAME:lower()) then
+                -- Add more specific checks here if multiple non-egg items might have "egg" in their name.
+                -- For example, check if it has a specific mesh ID, children parts, or attributes that confirm it's an egg.
+                -- Example: if obj:FindFirstChild("EggVisualPart") and obj.EggVisualPart.MeshId == "rbxassetid://12345" then
+                foundEgg = obj
+                break
+            end
+        end
+    end
+
+    if foundEgg then
+        eggToObserve = foundEgg
+        eggTypeFound = determineEggType(eggToObserve) -- Determine type immediately
+        print("Found egg to observe:", eggToObserve.Name, "(Determined Type:", eggTypeFound .. ")")
+        showRandomPetVisual(eggToObserve)
+    else
+        print("No egg model found matching criteria.")
+    end
+end
+
+--- GUI creation
+local function createGUI()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "PetEggRandomizerGUI"
+    screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 220, 0, 120) -- Slightly larger frame
+    frame.Position = UDim2.new(0.5, -110, 0.5, -60)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    frame.BorderSizePixel = 1
+    frame.BorderColor3 = Color3.fromRGB(70, 70, 70)
+    frame.Draggable = true -- Make the GUI draggable
+    frame.Parent = screenGui
+
+    local titleBar = Instance.new("Frame")
+    titleBar.Size = UDim2.new(1, 0, 0, 20)
+    titleBar.Position = UDim2.new(0, 0, 0, 0)
+    titleBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = frame
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, 0, 1, 0)
+    titleLabel.Text = "Pet Egg Visualizer"
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.SourceSansBold
+    titleLabel.TextScaled = true
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Parent = titleBar
+
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Size = UDim2.new(0.9, 0, 0.25, 0)
+    toggleButton.Position = UDim2.new(0.05, 0, 0.2, 0) -- Adjusted position
+    toggleButton.BackgroundColor3 = Color3.fromRGB(150, 70, 70) -- Reddish by default (OFF)
+    toggleButton.Text = "Toggle ESP (OFF)"
+    toggleButton.TextColor3 = Color3.new(1, 1, 1)
+    toggleButton.TextScaled = true
+    toggleButton.Font = Enum.Font.SourceSansBold
+    toggleButton.BorderSizePixel = 0
+    toggleButton.Parent = frame
+
+    local rerollButton = Instance.new("TextButton")
+    rerollButton.Size = UDim2.new(0.9, 0, 0.25, 0)
+    rerollButton.Position = UDim2.new(0.05, 0, 0.5, 0) -- Adjusted position
+    rerollButton.BackgroundColor3 = Color3.fromRGB(70, 70, 150) -- Bluish
+    rerollButton.Text = "Reroll Pet"
+    rerollButton.TextColor3 = Color3.new(1, 1, 1)
+    rerollButton.TextScaled = true
+    rerollButton.Font = Enum.Font.SourceSansBold
+    rerollButton.BorderSizePixel = 0
+    rerollButton.Parent = frame
+
+    local cooldownText = Instance.new("TextLabel")
+    cooldownText.Size = UDim2.new(0.9, 0, 0.15, 0)
+    cooldownText.Position = UDim2.new(0.05, 0, 0.8, 0) -- Adjusted position
+    cooldownText.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    cooldownText.Text = "Cooldown: Ready"
+    cooldownText.TextColor3 = Color3.new(1, 1, 1)
+    cooldownText.TextScaled = true
+    cooldownText.Font = Enum.Font.SourceSans
+    cooldownText.BackgroundTransparency = 1
+    cooldownText.Parent = frame
+
+    local lastRerollTime = 0
+    local REROLL_COOLDOWN = 1.6 -- seconds
+
+    toggleButton.MouseButton1Click:Connect(function()
+        isESPActive = not isESPActive
+        if isESPActive then
+            toggleButton.Text = "Toggle ESP (ON)"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(70, 150, 70)
+            findAndObserveEgg() -- Attempt to find egg when toggled on
+        else
+            toggleButton.Text = "Toggle ESP (OFF)"
+            toggleButton.BackgroundColor3 = Color3.fromRGB(150, 70, 70) -- Reddish when off
+            if currentVisualPet and currentVisualPet:IsDescendantOf(Workspace) then
+                currentVisualPet:Destroy()
+            end
+            eggToObserve = nil
+            eggTypeFound = nil
+        end
+    end)
+
+    rerollButton.MouseButton1Click:Connect(function()
+        local currentTime = tick()
+        if currentTime - lastRerollTime >= REROLL_COOLDOWN then
+            if isESPActive and eggToObserve and eggToObserve:IsDescendantOf(Workspace) then
+                showRandomPetVisual(eggToObserve)
+                lastRerollTime = currentTime
+            elseif not isESPActive then
+                cooldownText.Text = "ESP is OFF!"
+                task.delay(1, function() if not isESPActive then cooldownText.Text = "Cooldown: Ready" end end)
+            else
+                cooldownText.Text = "No egg found!"
+                task.delay(1, function() if isESPActive and not eggToObserve then cooldownText.Text = "Cooldown: Ready" end end)
+            end
+        else
+            local remaining = math.ceil(REROLL_COOLDOWN - (currentTime - lastRerollTime))
+            cooldownText.Text = string.format("Reroll in: %ds", remaining)
+        end
+    end)
+
+    -- Cooldown update loop
+    RunService.Stepped:Connect(function() -- Use RunService.Stepped for smoother updates
+        local remaining = math.max(0, REROLL_COOLDOWN - (tick() - lastRerollTime))
+        if remaining > 0 then
+            cooldownText.Text = string.format("Cooldown: %.1fs", remaining)
+        else
+            cooldownText.Text = "Cooldown: Ready"
+        end
+    end)
+end
+
+-- Main loop to re-check for eggs if ESP is active (in case the egg despawns/respawns)
+task.spawn(function()
+    while true do
+        if isESPActive then
+            -- If current egg is gone or not set, try to find a new one
+            if not eggToObserve or not eggToObserve:IsDescendantOf(Workspace) then
+                findAndObserveEgg()
+            end
+        end
+        task.wait(2) -- Check every 2 seconds
+    end
+end)
+
+-- Initialize GUI
+createGUI()
+
+print("Pet Egg Visual Randomizer Script Loaded. Use the GUI to activate.")
